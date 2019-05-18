@@ -1,20 +1,65 @@
 # VS Code `npm test` Screenshot
 
 In this repository I aim to prototype a process whereby a VS Code extension's test suite contains methods (faux unit tests)
-which connect to the VS Code extension host window using `--inspect` and the DevTools protocol and use the Electron APIs to
-capture a screenshot of the VS Code extension host automatically.
+which connect to the VS Code extension host window using CDP and use the Electron's `capturePage` API to capture a screenshot
+of the VS Code extension host window automatically.
 
 The faux unit test method may contain a scene setup code so that multiple screenshots can be taken displaying various stages
-of whatever functionality the extension implements and wishes to display and these screenshots may then be references in the
+of whatever functionality the extension implements and wishes to display and these screenshots may then be referenced in the
 extensions README file or anywhere else.
 
-The key component of this endeavour is an ability to connect to an Electron application with a debugger attached and use the
-Electron `capturePage` API to obtain a screenshot and save it. I have recently learnt of a way to achieve this, it goes like
-this:
+To test this, I've bootstrapped a VS Code extension in this repository. The easiest way to connect to the VS Code extension
+host window would be to start the `code` process with the `--inspect` CLI argument. Any Electron-based app started this way
+will start a CDP server which can be then connected to and from there, the developer tools console can be used to issue
+commands.
 
-- Start an Electron based application, like VS Code, with the debugger attached: `code --inspect`
-- Go to `chrome://inspect` in Chrome (or use another DevTools protocol client) and open the DevTools
-- Enter the following client at the developer tools console, utilizing the Electron API for screenshot capture:
+Unfortunately, the default Yeoman VS Code extension template does not allow any control over the Code CLI arguments. The
+process is started by a script in `node_modules/vscode/bin/test` which downloads a test instance of VS Code and runs if with
+a fixed set of CLI arguments which does not include `--inspect` are is not user-extensible without patching the file itself.
+This file is referenced in `npm test`.
+
+I want to avoid patching anything in `node_modules` so I pursue another option, which is to find the PID of the extension
+host process from within itself and use Node's `process._debugProcess` API to nudge it to start the CDP server after it's
+been started.
+
+Normal Electron apps start 3 processes and VS Code starts about a dozen, so I need to determine a way to find the right PID.
+Only one of the `code` PIDs will respond to `process._debugProcess` by opening up the CDP server and writing the web socket
+connection details into its standard output.
+
+- [ ] Find out if the debugger attachment line appears in `node_modules/bin/test` VS Code output it relays to the terminal
+
+The easiest way to determine the PID of the process which is the main Electron process (and has the main process JavaScript
+context) is to find other `code` processes which were started by processes who themselves are `code`. For each running `code`
+process, if its parent process ID refers to another `code` process, I ignore it and look for a single `code` process whose
+parent PID is not a PID of another `code` process.
+
+This works is done in `screenshot/main.csx`.
+
+If multiple `code` instances were running, this script would fail, but VS Code already demands that it be the sole instance
+running when running `npm test` so this is not a concern as this limitation is aligned with VS Code itself.
+
+The next step is to take this PID and run a node script which takes it and runs `process._debugProcess` on it.
+This is in `screenshot/debug.js`.
+
+At this point we can sanity-check this works with VS Code. Open two terminals side by side and in one run `code --wait` and
+in the other `cd screenshot && dotnet script main.csx`. You should see that it finds the correct PID and pings VS Code to
+enter debug mode at which point the first terminal where VS Code was ran will show something like:
+
+```
+Debugger listening on ws://127.0.0.1:9229/00000000-0000-0000-0000-000000000000
+For help, see: https://nodejs.org/en/docs/inspector
+```
+
+We do this sanity check in the code by calling `http://localhost:9229/json`.
+The URL is a part of a set of HTTP endpoints a debugging-enabled process exposes, more on the topic here:
+https://chromedevtools.github.io/devtools-protocol/#endpoints
+At some point it would be good to check the port if we can read it, but it's the default so whatever for now.
+
+We can connect to the process using any CDP compatible client, like `chrome://inspect` or a CDP JavaScript library.
+We use the CDP method https://chromedevtools.github.io/devtools-protocol/tot/Runtime#method-compileScript to execute a
+snippet which will capture the window screenshot and save it to a known location.
+
+- [ ] Figure out why the script fails to execute `console.log`
 
 ```javascript
 const electron = process.mainModule.require('electron')
@@ -24,9 +69,4 @@ webContents.capturePage(image => fs.writeFileSync('screenshot.png', image.toPNG(
 // Look in `process.cwd()`
 ```
 
-The missing pieces to make this all work then are:
-
-- Ensure `npm test` starts the VS Code extension host with a debugger attached (if it doesn't already)
-- Use a DevTools protocol client library or the web socket connection directly to connect and issue the above commands
-- Set up faux unit test methods which set up a scene (such as document contents and selection, command issuance etc.)
-- Gather the screenshot files and place them to predetermined places as a part of the test run
+- [ ] Run `main.csx` from within a faux unit test method which sets the scene in the VS Code window
