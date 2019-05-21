@@ -1,12 +1,12 @@
 # VS Code `npm test` Screenshot
 
-In this repository I aim to prototype a process whereby a VS Code extension's test suite contains methods (faux unit tests)
-which connect to the VS Code extension host window using CDP and use the Electron's `capturePage` API to capture a screenshot
-of the VS Code extension host window automatically.
+In this repository I demonstrate a process whereby a VS Code extension's test suite contains methods (faux unit tests)
+which connect to the VS Code extension host window using CDP and uses the Electron's `capturePage` API to capture a
+screenshot of the VS Code extension host window automatically.
 
-The faux unit test method may contain a scene setup code so that multiple screenshots can be taken displaying various stages
-of whatever functionality the extension implements and wishes to display and these screenshots may then be referenced in the
-extensions README file or anywhere else.
+The faux unit test method contains scene setup code so that multiple screenshots can be taken displaying various stages
+of whatever functionality the extension implements and wishes to display and these screenshots may then be referenced in
+the extensions README file or anywhere else.
 
 To test this, I've bootstrapped a VS Code extension in this repository. The easiest way to connect to the VS Code extension
 host window would be to start the `code` process with the `--inspect` CLI argument. Any Electron-based app started this way
@@ -59,14 +59,6 @@ We can connect to the process using any CDP compatible client, like `chrome://in
 We use the CDP method https://chromedevtools.github.io/devtools-protocol/tot/Runtime#method-compileScript to execute a
 snippet which will capture the window screenshot and save it to a known location.
 
-- [ ] Figure out why the script fails to execute `console.log`
+See `npm test` and `src/test`
 
-```javascript
-const electron = process.mainModule.require('electron')
-const fs = process.mainModule.require('fs')
-const webContents = electron.webContents.getAllWebContents()[0] // [1] is the shared process
-webContents.capturePage(image => fs.writeFileSync('screenshot.png', image.toPNG()))
-// Look in `process.cwd()`
-```
-
-- [ ] Run `main.csx` from within a faux unit test method which sets the scene in the VS Code window
+![](screenshot.png)

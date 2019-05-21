@@ -3,9 +3,14 @@ import fetch from 'node-fetch';
 import * as ws from 'ws';
 import * as fs from 'fs-extra';
 import * as assert from 'assert';
+import * as vscode from 'vscode';
 
 suite("Extension Tests", function () {
   test("Screenshot", async function () {
+    console.log('Preparing the scene…');
+    const document = await vscode.workspace.openTextDocument({ language: 'markdown', content: '# VS Code Extension `npm test` Screenshot\n\nThis is a demo.\n' });
+    await vscode.window.showTextDocument(document);
+
     console.log('Listing running Code instances…');
     const processes = await ps();
     const codes = processes.filter(p => p.name === 'Code.exe');
@@ -61,5 +66,5 @@ new Promise(resolve => webContents.capturePage(image => resolve(image.toDataURL(
 
     console.log('Enabling the runtime agent…');
     socket.send(JSON.stringify({ id: 1, method: 'Runtime.enable' }));
-  });
+  }).timeout(5000);
 });
