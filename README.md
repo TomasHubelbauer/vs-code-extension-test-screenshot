@@ -1,5 +1,7 @@
 # VS Code `npm test` Screenshot
 
+- [ ] Update this to recap findings now that this experiment has been a success
+
 In this repository I demonstrate a process whereby a VS Code extension's test suite contains methods (faux unit tests)
 which connect to the VS Code extension host window using CDP and uses the Electron's `capturePage` API to capture a
 screenshot of the VS Code extension host window automatically.
@@ -62,3 +64,6 @@ snippet which will capture the window screenshot and save it to a known location
 See `npm test` and `src/test`
 
 ![](screenshot.png)
+
+- [ ] See if `CODE_TESTS_WORKSPACE` could be abused by supplying `--inspect` there
+- [ ] Release this as an NPM library

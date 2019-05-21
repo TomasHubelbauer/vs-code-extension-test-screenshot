@@ -66,5 +66,5 @@ new Promise(resolve => webContents.capturePage(image => resolve(image.toDataURL(
 
     console.log('Enabling the runtime agent…');
     socket.send(JSON.stringify({ id: 1, method: 'Runtime.enable' }));
-  }).timeout(5000);
+  });
 });

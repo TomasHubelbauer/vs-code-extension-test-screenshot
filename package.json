@@ -26,7 +26,7 @@
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
-		"test": "npm run compile && node ./node_modules/vscode/bin/test"
+		"test": "npm run compile && cross-env CODE_DISABLE_EXTENSIONS=true node ./node_modules/vscode/bin/test"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^7.0.0",
@@ -35,6 +35,7 @@
 		"@types/node-fetch": "^2.3.4",
 		"@types/ps-list": "^6.2.1",
 		"@types/ws": "^6.0.1",
+		"cross-env": "^5.2.0",
 		"fs-extra": "^8.0.1",
 		"node-fetch": "^2.6.0",
 		"ps-list": "^6.3.0",
