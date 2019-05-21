@@ -3,3 +3,4 @@ node_modules
 
 # Code
 .vscode-test
+out
