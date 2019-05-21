@@ -20,7 +20,8 @@ suite("Extension Tests", function () {
         assert.equal(-1, [1, 2, 3].indexOf(0));
     });
 
+    const timeout = 60 * 60 * 1000;
     test("Screenshot", async function () {
         await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000));
-    }).timeout(5 * 60 * 1000 + 1000);
+    }).timeout(timeout + 1000);
 });
