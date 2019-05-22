@@ -67,3 +67,5 @@ See `npm test` and `src/test`
 
 - [ ] See if `CODE_TESTS_WORKSPACE` could be abused by supplying `--inspect` there
 - [ ] Release this as an NPM library
+- [ ] Try to use https://chromedevtools.github.io/devtools-protocol/tot/Page#method-captureScreenshot instead of the script
+- [ ] Explore https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-startScreencast for video
