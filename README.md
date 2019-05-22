@@ -70,7 +70,7 @@ See `npm test` and `src/test`
 
 - [ ] Figure out how to use `Page.captureScreenshot` and `Page.startScreencast`
   
-  `captureScreenshot`
+  `captureScreenshot` example
   ```javascript
   console.log('Subscribing to callbacks…');
   socket.on('message', async data => {
@@ -86,7 +86,7 @@ See `npm test` and `src/test`
   socket.send(JSON.stringify({ id: 1, method: 'Page.captureScreenshot' }));
   ```
 
-  `startScreencast`
+  `startScreencast` example
   ```javascript
   console.log('Subscribing to callbacks…');
   socket.on('message', async data => {
@@ -98,3 +98,5 @@ See `npm test` and `src/test`
   ```
 
   - [ ] See if `Page.startScreencast` might work for animated GIFs for the README
+        
+    Check out https://github.com/eugeneware/gifencoder and `get-pixels` for Base64 to RGBA array for it
