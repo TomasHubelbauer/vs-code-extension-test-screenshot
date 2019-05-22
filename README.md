@@ -67,5 +67,34 @@ See `npm test` and `src/test`
 
 - [ ] See if `CODE_TESTS_WORKSPACE` could be abused by supplying `--inspect` there
 - [ ] Release this as an NPM library
-- [ ] Try to use https://chromedevtools.github.io/devtools-protocol/tot/Page#method-captureScreenshot instead of the script
-- [ ] Explore https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-startScreencast for video
+
+- [ ] Figure out how to use `Page.captureScreenshot` and `Page.startScreencast`
+  
+  `captureScreenshot`
+  ```javascript
+  console.log('Subscribing to callbacks…');
+  socket.on('message', async data => {
+    console.log(data); // 'Page.captureScreenshot' wasn't found
+    assert.ok(data);
+    const buffer = Buffer.from(String(data), 'base64');
+    console.log('Saving the screenshot buffer…');
+    // Note that `process.cwd()` is in `.vscode-test/vscode-version`
+    await fs.writeFile('../../screenshot.png', buffer);
+  });
+
+  console.log('Capturing the screenshot');
+  socket.send(JSON.stringify({ id: 1, method: 'Page.captureScreenshot' }));
+  ```
+
+  `startScreencast`
+  ```javascript
+  console.log('Subscribing to callbacks…');
+  socket.on('message', async data => {
+    console.log(data);
+  });
+
+  console.log('Starting the screencast');
+  socket.send(JSON.stringify({ id: 1, method: 'Page.startScreencast' }));
+  ```
+
+  - [ ] See if `Page.startScreencast` might work for animated GIFs for the README
