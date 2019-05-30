@@ -65,6 +65,9 @@ See `npm test` and `src/test`
 
 ![](screenshot.png)
 
+- [ ] See if in v1.35 `--inspect` could be passed using `launch.json`:
+  https://github.com/microsoft/vscode-docs/blob/vnext/api/working-with-extensions/testing-extension.md
+
 - [ ] See if `CODE_TESTS_WORKSPACE` could be abused by supplying `--inspect` there
 - [ ] Release this as an NPM library
 
