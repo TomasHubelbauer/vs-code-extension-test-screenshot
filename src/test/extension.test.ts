@@ -33,7 +33,10 @@ It was captured on *${new Date().toLocaleString()}*.
 
     console.log('Listing running VS Code processes');
     const processes = await ps();
-    const codes = processes.filter(p => p.name === 'Code.exe');
+    const codes = processes.filter(p => p.name === 'Code.exe' || p.name === 'code');
+    for (const code of codes) {
+      console.log(code.name, code.pid, code.ppid);
+    }
 
     console.log('Finding the main VS Code process among', codes.length);
     const main = codes.find(code => !codes.find(code2 => code2.pid === code.ppid))!;
