@@ -25,10 +25,6 @@ jobs:
         npm test
         # Stage the captured screenshot
         git add screenshot.png
-        # Commit the changes to the Git repository if any
-        if git diff-index --quiet HEAD --; then
-          exit
-        fi
         git commit -m "Commit the captured screenshot"
         # Authenticate with GitHub using the out of the box workflow integration PAT
         git remote set-url origin https://tomashubelbauer:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
