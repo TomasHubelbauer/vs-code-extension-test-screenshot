@@ -61,6 +61,9 @@ Afterwards, remove the `rm` commit in the workflow as it won't be needed, since
 the screenshot contain the current date, they will always have a change and thus
 there will be changes to commit.
 
+Standalone Electron doesn't have the same issue:
+https://github.com/TomasHubelbauer/electron-xvfb
+
 ### Matrix the GitHub Actions workflow and collect screenshots for all platforms
 
 ### Package this as a library
