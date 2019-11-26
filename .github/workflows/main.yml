@@ -1,0 +1,34 @@
+name: github-actions
+on:
+  push:
+    branches:
+    - master
+jobs:
+  github-actions:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Capture the screenshot
+      run: |
+        set -x
+        # Configure Git for the push from the workflow to the repository
+        git config --global user.email "tomas@hubelbauer.net"
+        git config --global user.name "Tomas Hubelbauer"
+        # Check out the `master` branch because by default GitHub Actions checks out detached HEAD
+        git checkout master
+        # Run the script using the custom PAT which as the API is not accessible with the integration one
+        npm install
+        npm test
+        # Stage the captured screenshot
+        git add screenshot.png
+        # Commit the changes to the Git repository if any
+        if git diff-index --quiet HEAD --; then
+          exit
+        fi
+        git commit -m "Commit the captured screenshot"
+        # Authenticate with GitHub using the out of the box workflow integration PAT
+        git remote set-url origin https://tomashubelbauer:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+        # Pull before pushing to integrate fast forward changes if any
+        git pull
+        # Push the generated data to GitHub
+        git push
