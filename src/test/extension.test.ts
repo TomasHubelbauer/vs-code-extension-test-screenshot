@@ -1,3 +1,4 @@
+import { join, resolve } from 'path';
 import ps from 'ps-list';
 import fetch from 'node-fetch';
 import * as ws from 'ws';
@@ -7,26 +8,47 @@ import * as vscode from 'vscode';
 
 suite("Extension Tests", function () {
   test("Screenshot", async function () {
-    console.log('Preparing the scene…');
-    const document = await vscode.workspace.openTextDocument({ language: 'markdown', content: '# VS Code Extension `npm test` Screenshot\n\nThis is a demo.\n' });
+    console.log('Generating the showcase file…');
+    const content = `# VS Code Extension \`npm test\` Screenshot
+
+This screenshot was captured completely automatically for the purpose of VS Code
+extension documentation generation.
+
+It was captured on *${new Date().toLocaleString()}*.
+`;
+
+    // Dot up out of the directory with the test version of VS Code
+    const directoryPath = '../../demo';
+    await fs.emptyDir(directoryPath);
+    const filePath = resolve(join(directoryPath, 'readme.md'));
+    await fs.writeFile(filePath, content);
+
+    console.log('Opening the demo file…');
+    const document = await vscode.workspace.openTextDocument(filePath);
     await vscode.window.showTextDocument(document);
 
-    console.log('Listing running Code instances…');
+    // TODO: Figure out how to detect this better, the VS Code API resolves too soon
+    console.log('Waiting for the document to open and syntax highlighting to run…');
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    console.log('Listing running VS Code processes…');
     const processes = await ps();
     const codes = processes.filter(p => p.name === 'Code.exe');
 
-    console.log('Finding main Code instance…');
+    console.log('Finding the main VS Code process…');
     const main = codes.find(code => !codes.find(code2 => code2.pid === code.ppid))!;
 
-    console.log('Attaching to Code instance with PID', main.pid);
+    console.log('Attaching to the main VS Code process with PID', main.pid);
     (process as any)._debugProcess(main.pid);
 
+    // https://chromedevtools.github.io/devtools-protocol/#endpoints
+    // chrome://inspect
     console.log('Downloading the debugger information…');
     const response = await fetch('http://localhost:9229/json');
     const data = await response.json();
     const url: string = data[0].webSocketDebuggerUrl;
 
-    console.log('Connecting to the debugger socket…', url);
+    console.log('Connecting to the debugger web socket…', url);
     const socket = new ws(url, { perMessageDeflate: false });
     await new Promise(resolve => socket.once('open', resolve));
 
@@ -52,6 +74,9 @@ new Promise(resolve => webContents.capturePage(image => resolve(image.toDataURL(
           console.log('Saving the screenshot buffer…');
           // Note that `process.cwd()` is in `.vscode-test/vscode-version`
           await fs.writeFile('../../screenshot.png', buffer);
+
+          console.log('Deleting the temporary showcase file…');
+          await fs.remove(directoryPath);
           break;
         }
         case undefined: {
