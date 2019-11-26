@@ -21,12 +21,11 @@ jobs:
         # Install Node dependencies
         npm install
         # Start XVFB so that VS Code can start and then run the tests
-        /usr/bin/Xvfb :1 -screen 0 1024x768x24 &
+        /usr/bin/Xvfb :1 -screen 0 1024x768x32 &
         npm test
         # Stage the captured screenshot
-        echo $PWD
-        git status
         git add screenshot*.png
+        git status
         git commit -m "Commit the captured screenshots"
         # Authenticate with GitHub using the out of the box workflow integration PAT
         git remote set-url origin https://tomashubelbauer:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
