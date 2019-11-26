@@ -75,7 +75,7 @@ new Promise(resolve => webContents.capturePage(image => resolve(image.toDataURL(
           assert.ok(json.result.result.value);
           const buffer = Buffer.from(json.result.result.value.substring('data:image/png;base64,'.length), 'base64');
           const screenshotPath = resolve('../../screenshot.png');
-          console.log('Saving the screenshot buffer', screenshotPath);
+          console.log('Saving the screenshot buffer', screenshotPath, process.cwd());
           // Note that `process.cwd()` is in `.vscode-test/vscode-version`
           await fs.writeFile('../../screenshot.png', buffer);
 

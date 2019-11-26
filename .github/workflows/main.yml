@@ -25,6 +25,7 @@ jobs:
         npm test
         # Stage the captured screenshot
         git status
+        echo $PWD
         git add screenshot.png
         git commit -m "Commit the captured screenshot"
         # Authenticate with GitHub using the out of the box workflow integration PAT
