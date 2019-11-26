@@ -64,6 +64,9 @@ there will be changes to commit.
 Standalone Electron doesn't have the same issue:
 https://github.com/TomasHubelbauer/electron-xvfb
 
+I am trying to reproduce it with VS Code here:
+https://github.com/TomasHubelbauer/vs-code-xvfb
+
 ### Matrix the GitHub Actions workflow and collect screenshots for all platforms
 
 ### Package this as a library
