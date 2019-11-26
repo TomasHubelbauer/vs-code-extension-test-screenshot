@@ -44,6 +44,12 @@ but it is not a concern until Microsoft has enabled that.
 
 ## To-Do
 
+### Fix the screenshot not getting writ in GitHub Actions
+
+### Fix a black screen coming out of XVFB in GitHub Actions
+
+### Matrix the GitHub Actions workflow and collect screenshots for all platforms
+
 ### Package this as a library
 
 ### Look into `Page.captureScreenshot` and `Page.startScreencast`

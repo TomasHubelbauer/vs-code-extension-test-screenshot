@@ -26,8 +26,8 @@ jobs:
         # Stage the captured screenshot
         echo $PWD
         git status
-        git add screenshot.png
-        git commit -m "Commit the captured screenshot"
+        git add screenshot*.png
+        git commit -m "Commit the captured screenshots"
         # Authenticate with GitHub using the out of the box workflow integration PAT
         git remote set-url origin https://tomashubelbauer:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         # Pull before pushing to integrate fast forward changes if any
