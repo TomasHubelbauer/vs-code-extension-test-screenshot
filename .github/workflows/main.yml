@@ -9,6 +9,8 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Capture the screenshot
+      env:
+        DISPLAY: ':99.0'
       run: |
         set -x
         # Configure Git for the push from the workflow to the repository
@@ -16,8 +18,10 @@ jobs:
         git config --global user.name "Tomas Hubelbauer"
         # Check out the `master` branch because by default GitHub Actions checks out detached HEAD
         git checkout master
-        # Run the script using the custom PAT which as the API is not accessible with the integration one
+        # Install Node dependencies
         npm install
+        # Start XVFB so that VS Code can start and then run the tests
+        /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1
         npm test
         # Stage the captured screenshot
         git add screenshot.png
