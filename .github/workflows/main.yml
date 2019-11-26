@@ -21,14 +21,15 @@ jobs:
         # Install Node dependencies
         npm install
         # Start XVFB so that VS Code can start and then run the tests
-        /usr/bin/Xvfb -screen 0 1024x768x8 &
-        # Touch the screenshot files so that if they don't change there's still stuff to commit
-        touch screenshot-*.png
+        /usr/bin/Xvfb -screen 0 1024x768x24 &
+        # Delete the screenshot files so that if they don't change there's still stuff to commit
+        rm screenshot-*.png
+        git add screenshot-*.png
+        git commit -m "Delete outdated screenshots"
         # Run the test which generates the screenshot
         npm test
         # Stage the captured screenshot
         git add screenshot-*.png
-        git status
         git commit -m "Commit the captured screenshots"
         # Authenticate with GitHub using the out of the box workflow integration PAT
         git remote set-url origin https://tomashubelbauer:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
