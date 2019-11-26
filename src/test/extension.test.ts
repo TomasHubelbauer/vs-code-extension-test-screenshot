@@ -51,6 +51,10 @@ It was captured on *${new Date().toLocaleString()}*.
     const data = await response.json();
     const url: string = data[0].webSocketDebuggerUrl;
 
+    // TODO: Implement a retry mechanism instead, sometimes in GitHub Actions this fails otherwise
+    console.log('Waiting for the web socket to be ready');
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     console.log('Connecting to the debugger web socket', url);
     const socket = new ws(url, { perMessageDeflate: false });
     await new Promise(resolve => socket.once('open', resolve));
