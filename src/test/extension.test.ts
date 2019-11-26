@@ -76,7 +76,7 @@ new Promise(resolve => webContents.capturePage(image => resolve(image.toDataURL(
           const buffer = Buffer.from(json.result.result.value.substring('data:image/png;base64,'.length), 'base64');
           // Note that in local, `process.cwd()` is in `.vscode-test/vscode-version`
           const screenshotPath = resolve((process.cwd().includes('.vscode-test') ? '../../' : '') + 'screenshot.png');
-          console.log('Saving the screenshot buffer', screenshotPath, process.cwd());
+          console.log('Saving the screenshot buffer');
           await fs.writeFile(screenshotPath, buffer);
 
           console.log('Deleting the temporary demo file');
