@@ -24,6 +24,8 @@ jobs:
         /usr/bin/Xvfb :1 -screen 0 1024x768x24 &
         npm test
         # Stage the captured screenshot
+        echo $PWD
+        git status
         git add screenshot.png
         git commit -m "Commit the captured screenshot"
         # Authenticate with GitHub using the out of the box workflow integration PAT
