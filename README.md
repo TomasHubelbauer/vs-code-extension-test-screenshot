@@ -13,11 +13,22 @@ used by any VS Code extension. The utility of this would be to in addition to
 having a normal test suite have a test suite which would generates screenshots
 showcasing the extension functionality for the docs and the readme.
 
-![](screenshot.png)
-
 ## Running
 
 `npm test` generates `screenshot.png`
+
+## Screenshots
+
+These are the latest screenshots coming from the
+[workflow](.github/workflows/main.yml)
+
+### win32
+
+![](screenshot-win32.png)
+
+### linux
+
+![](screenshot-linux.png)
 
 ## Notes
 
@@ -43,8 +54,6 @@ VS Code processes and we will need to use something like the window title then),
 but it is not a concern until Microsoft has enabled that.
 
 ## To-Do
-
-### Fix the screenshot not getting writ in GitHub Actions
 
 ### Fix a black screen coming out of XVFB in GitHub Actions
 
