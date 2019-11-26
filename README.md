@@ -57,10 +57,9 @@ but it is not a concern until Microsoft has enabled that.
 
 ### Fix a black screen coming out of XVFB in GitHub Actions
 
-Afterwards, the unique names of the screenshot files can be removed again, right
-now they are there because since the screenshot is always the same black screen,
-there is no diff so it is not possible to stage and commit anything and that
-fails the workflow.
+Afterwards, remove the `touch` in the workflow as it won't be needed, since the
+screenshot contain the current date, they will always have a change and thus
+there will be changes to commit.
 
 ### Matrix the GitHub Actions workflow and collect screenshots for all platforms
 
