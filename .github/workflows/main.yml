@@ -21,7 +21,7 @@ jobs:
         # Install Node dependencies
         npm install
         # Start XVFB so that VS Code can start and then run the tests
-        /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1
+        /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
         npm test
         # Stage the captured screenshot
         git add screenshot.png
