@@ -100,6 +100,5 @@ console.log('Starting the screencast');
 socket.send(JSON.stringify({ id: 1, method: 'Page.startScreencast' }));
 ```
 
-See if `Page.startScreencast` might work for animated GIFs for the README.
-        
-Check out https://github.com/eugeneware/gifencoder and `get-pixels` for Base64 to RGBA array for it.
+See if `Page.startScreencast` might work for animated APNGs for the README.
+Use my `node-apng` for that.
