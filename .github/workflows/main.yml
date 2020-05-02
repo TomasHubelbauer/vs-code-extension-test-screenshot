@@ -9,31 +9,29 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Capture the screenshot
-      env:
-        DISPLAY: ':0.0'
-      run: |
-        set -x
-        # Configure Git for the push from the workflow to the repository
-        git config --global user.email "tomas@hubelbauer.net"
-        git config --global user.name "Tomas Hubelbauer"
-        # Check out the `master` branch because by default GitHub Actions checks out detached HEAD
-        git checkout master
-        # Install Node dependencies
-        npm install
-        # Start XVFB so that VS Code can start and then run the tests
-        /usr/bin/Xvfb :0 &
-        # Delete the screenshot files so that if they don't change there's still stuff to commit
-        rm screenshot-*.png
-        git add screenshot-*.png
-        git commit -m "Delete outdated screenshots"
-        # Run the test which generates the screenshot
-        npm test
-        # Stage the captured screenshot
-        git add screenshot-*.png
-        git commit -m "Commit the captured screenshots"
-        # Authenticate with GitHub using the out of the box workflow integration PAT
-        git remote set-url origin https://tomashubelbauer:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        # Pull before pushing to integrate fast forward changes if any
-        git pull
-        # Push the generated data to GitHub
-        git push
+      uses: GabrielBB/xvfb-action@v1.0
+      with:
+        run: |
+          set -x
+          # Configure Git for the push from the workflow to the repository
+          git config --global user.email "tomas@hubelbauer.net"
+          git config --global user.name "Tomas Hubelbauer"
+          # Check out the `master` branch because by default GitHub Actions checks out detached HEAD
+          git checkout master
+          # Install Node dependencies
+          npm install
+          # Delete the screenshot files so that if they don't change there's still stuff to commit
+          rm screenshot-*.png
+          git add screenshot-*.png
+          git commit -m "Delete outdated screenshots"
+          # Run the test which generates the screenshot
+          npm test
+          # Stage the captured screenshot
+          git add screenshot-*.png
+          git commit -m "Commit the captured screenshots"
+          # Authenticate with GitHub using the out of the box workflow integration PAT
+          git remote set-url origin https://tomashubelbauer:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          # Pull before pushing to integrate fast forward changes if any
+          git pull
+          # Push the generated data to GitHub
+          git push
