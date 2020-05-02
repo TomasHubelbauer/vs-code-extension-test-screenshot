@@ -10,6 +10,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Capture the screenshot
       run: |
+        export DISPLAY=":0"
         set -x
         # Configure Git for the push from the workflow to the repository
         git config --global user.email "tomas@hubelbauer.net"
