@@ -155,7 +155,7 @@ suite("Extension Tests", function () {
     const buffers: Buffer[] = [];
     const fps = 10;
     do {
-      console.log(~~progress, '%');
+      console.log('Recording:', ~~progress, '%');
 
       // Evaluate the expression which logs the screenshot data URL to the console
       //console.log('Evaluating the expression which captures the screenshot', ~~progress, '%');
@@ -196,6 +196,7 @@ suite("Extension Tests", function () {
     const readmePath = path.resolve((process.cwd().includes('.vscode-test') ? '../../' : '') + 'README.md');
     let readme = await fs.readFile(readmePath, { encoding: 'utf-8' });
     const markdown = `<!-- screencast ${process.platform} -->\n![](screencast-${process.platform}-${stamp}.apng)\n<!-- /screencast ${process.platform} -->`;
+    console.log('Embedding', markdown, 'into the readme')
     switch (process.platform) {
       case 'linux': {
         readme = readme.replace(/<!-- screencast linux -->[\s\S]*<!-- \/screencast linux -->/, markdown);
