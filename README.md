@@ -3,7 +3,7 @@
 Windows:
 
 <!-- screencast win32 -->
-![](screencast-win32-2020-05-04T18-40-31.431Z.apng)
+![](screencast-2020-05-04T19-28-28.896Z-win32.apng)
 <!-- /screencast win32 -->
 
 Linux:
