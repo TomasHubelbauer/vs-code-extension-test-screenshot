@@ -155,8 +155,10 @@ suite("Extension Tests", function () {
     const buffers: Buffer[] = [];
     const fps = 10;
     do {
+      console.log(~~progress, '%');
+
       // Evaluate the expression which logs the screenshot data URL to the console
-      console.log('Evaluating the expression which captures the screenshot', ~~progress, '%');
+      //console.log('Evaluating the expression which captures the screenshot', ~~progress, '%');
       const expression = [
         // TODO: Find a way to make `replMode` work and then use `const`
         `var electron = process.mainModule.require('electron');`,
@@ -168,7 +170,7 @@ suite("Extension Tests", function () {
       socket.send(JSON.stringify({ id: index, method: 'Runtime.evaluate', params: { expression, awaitPromise: true, replMode: true } }));
 
       // Await the evaluation completion with the screenshot data URL
-      console.log('Awaiting the evaluation completion with the data URL', ~~progress, '%');
+      //console.log('Awaiting the evaluation completion with the data URL', ~~progress, '%');
       const dataUrl = await deferred.promise;
 
       // Bufferize the data URL
