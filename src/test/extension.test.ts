@@ -174,7 +174,7 @@ suite("Extension Tests", function () {
       const dataUrl = await deferred.promise;
 
       // Bufferize the data URL
-      console.log('Bufferizing the screenshot Base64');
+      //console.log('Bufferizing the screenshot Base64');
       const buffer = Buffer.from(dataUrl.substring('data:image/png;base64,'.length), 'base64');
       buffers.push(buffer);
 

@@ -11,7 +11,7 @@ jobs:
     - name: Capture the screenshot
       run: |
         export DISPLAY=":0"
-        sudo apt install xvfb pngcrush -y
+        sudo apt install xvfb -y
         set -x
         # Configure Git for the push from the workflow to the repository
         git config --global user.email "tomas@hubelbauer.net"
@@ -22,11 +22,6 @@ jobs:
         npm install
         # Run the test which generates the screenshot
         xvfb-run --auto-servernum npm test
-        # Crush all PNGs for smaller file sizes
-        for file in *.apng
-        do
-          pngcrush -ow "$file"
-        done
         # Stage the captured screenshot
         git add screencast-*.apng
         # Reset unstaged changes so that Git commit won't fail (e.g.: package-lock.json, temporary files, …)
