@@ -20,6 +20,8 @@ jobs:
         git checkout master
         # Install Node dependencies
         npm install
+        # Delete the current screencast if any
+        rm screencast-*-linux.apng
         # Run the test which generates the screenshot
         xvfb-run --auto-servernum npm test
         # Stage the captured screenshot
