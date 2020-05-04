@@ -25,7 +25,7 @@ jobs:
         # Run the test which generates the screenshot
         xvfb-run --auto-servernum npm test
         # Stage the captured screenshot
-        git add screencast-*.apng readme.md
+        git add screencast-*.apng README.md
         # Reset unstaged changes so that Git commit won't fail (e.g.: package-lock.json, temporary files, …)
         git checkout -- .
         # Bail if there are no changes to commit and hence no GitHub Pages to build
