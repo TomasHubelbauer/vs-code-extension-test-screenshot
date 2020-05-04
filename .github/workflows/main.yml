@@ -28,12 +28,10 @@ jobs:
         git add screencast-*.apng
         # Reset unstaged changes so that Git commit won't fail (e.g.: package-lock.json, temporary files, …)
         git checkout -- .
-        
         # Bail if there are no changes to commit and hence no GitHub Pages to build
         if git diff-index --quiet HEAD --; then
           exit
         fi
-
         # Commit the staged changes to the workflow repository
         git commit -m "Commit the recorded screencast"
         # Authenticate with GitHub using the out of the box workflow integration PAT

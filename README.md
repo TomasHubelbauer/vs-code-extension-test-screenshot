@@ -8,9 +8,9 @@ Windows:
 
 Linux:
 
-<!-- screencast win32 -->
+<!-- screencast linux -->
 todo
-<!-- /screencast win32 -->
+<!-- /screencast linux -->
 
 This repository contains a VS Code extension which has a faux test which does
 the following:

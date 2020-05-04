@@ -127,7 +127,7 @@ suite("Extension Tests", function () {
         await editor.edit(editBuilder => editBuilder.insert(editor.selection.end, content[index]));
 
         // Slow down the pace of the typing
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 20));
       }
 
       // Make for a dramatic closing
@@ -150,7 +150,7 @@ suite("Extension Tests", function () {
     });
 
     const buffers: Buffer[] = [];
-    const fps = 20;
+    const fps = 10;
     do {
       // Evaluate the expression which logs the screenshot data URL to the console
       console.log('Evaluating the expression which captures the screenshot');
