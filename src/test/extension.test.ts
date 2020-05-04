@@ -1,103 +1,130 @@
-import { join, resolve } from 'path';
+import * as path from 'path';
 import ps from 'ps-list';
 import fetch from 'node-fetch';
 import * as ws from 'ws';
 import * as fs from 'fs-extra';
-import * as assert from 'assert';
 import * as vscode from 'vscode';
+
+function defer<T>() {
+  let resolve: (value: T) => void = undefined!;
+  let reject: (reason: any) => void = undefined!;
+  const promise = new Promise<T>((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+
+  if (!resolve || !reject) {
+    throw new Error('Settlement methods have not been bound!');
+  }
+
+  return { promise, resolve, reject };
+}
 
 suite("Extension Tests", function () {
   test("Screenshot", async function () {
+    // Generate the demo file
     console.log('Generating the demo file');
-    const content = `# VS Code Extension \`npm test\` Screenshot
+    const content = [
+      '# VS Code Extension `npm test` Screenshot',
+      '',
+      'This screenshot was captured completely automatically for the purpose of',
+      'VS Code extension documentation generation.',
+      '',
+      `It was captured on *${new Date().toLocaleString()}*.`,
+    ].join('\n');
 
-This screenshot was captured completely automatically for the purpose of VS Code
-extension documentation generation.
-
-It was captured on *${new Date().toLocaleString()}*.
-`;
-
-    // Dot up out of the directory with the test version of VS Code
+    // Go up and out of the directory with the test version of VS Code in it
     const directoryPath = '../../demo';
     await fs.emptyDir(directoryPath);
-    const filePath = resolve(join(directoryPath, 'readme.md'));
+    const filePath = path.resolve(path.join(directoryPath, 'readme.md'));
     await fs.writeFile(filePath, content);
 
+    // Open the demo file in the VS Code instance used for testing
     console.log('Opening the demo file');
     const document = await vscode.workspace.openTextDocument(filePath);
     await vscode.window.showTextDocument(document);
 
+    // Wait for the document to open in VS Code
     // TODO: Figure out how to detect this better, the VS Code API resolves too soon
     console.log('Waiting for the document to open and syntax highlighting to kick in');
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
-    console.log('Listing running VS Code processes');
+    // Find the running VS Code process ID
+    console.log('Finding running VS Code process ID');
     const processes = await ps();
     const codes = processes.filter(p => p.name === 'Code.exe' || p.name === 'code');
-    for (const code of codes) {
-      console.log(code.name, code.pid, code.ppid);
+    const main = codes.find(code => !codes.find(code2 => code2.pid === code.ppid));
+    if (!main) {
+      console.log('Failed to find the main VS Code instance process among these:');
+      for (const code of codes) {
+        console.log(code.name, code.pid, code.ppid);
+      }
+
+      throw new Error('Failed to determine main VS Code process ID.');
     }
 
-    console.log('Finding the main VS Code process among', codes.length);
-    const main = codes.find(code => !codes.find(code2 => code2.pid === code.ppid))!;
-
-    console.log('Attaching to the main VS Code process with PID', main.pid);
+    // Attach a debugger to the VS Code process
+    console.log('Attaching a debugger to a VS Code process with PID', main.pid);
     (process as any)._debugProcess(main.pid);
 
+    // Download the debugger connection information
     // https://chromedevtools.github.io/devtools-protocol/#endpoints
     // chrome://inspect
-    console.log('Downloading the debugger information');
+    console.log('Downloading the debugger connection information');
     const response = await fetch('http://localhost:9229/json');
     const data = await response.json();
-    const url: string = data[0].webSocketDebuggerUrl;
+    const url = data[0].webSocketDebuggerUrl as string;
 
+    // Wait for the web socket to be ready
     // TODO: Implement a retry mechanism instead, sometimes in GitHub Actions this fails otherwise
     console.log('Waiting for the web socket to be ready');
-    await new Promise(resolve => setTimeout(resolve, 250));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-    console.log('Connecting to the debugger web socket', url);
+    // Connect to the debugger web socket
+    console.log('Connecting to the debugger web socket');
     const socket = new ws(url, { perMessageDeflate: false });
     await new Promise(resolve => socket.once('open', resolve));
 
-    console.log('Subscribing to callbacks');
+    // Defer anticipated messages to promises based on callbacks
+    console.log('Deferring anticipated messages to promises based on callbacks');
+    const { promise, resolve, reject } = defer<string>();
     socket.on('message', async data => {
-      const json = JSON.parse(String(data));
-      switch (json.id) {
-        case 1: {
-          console.log('Evaluating the expression');
-          // Note that we are using `var` so that we can redeclare the variables on each run making the script reentrant
-          // Note that we are sending a data URI of the image as we cannot send the `NativeImage` instance itself
-          const expression = `
-var electron = process.mainModule.require('electron');
-var webContents = electron.webContents.getAllWebContents()[0] // [1] is the shared process
-new Promise(resolve => webContents.capturePage(image => resolve(image.toDataURL())));
-`;
-          socket.send(JSON.stringify({ id: 2, method: 'Runtime.evaluate', params: { expression, awaitPromise: true } }));
-          break;
-        }
-        case 2: {
-          assert.ok(json.result.result.value);
-          const buffer = Buffer.from(json.result.result.value.substring('data:image/png;base64,'.length), 'base64');
-          // Note that in local, `process.cwd()` is in `.vscode-test/vscode-version`
-          const screenshotPath = resolve((process.cwd().includes('.vscode-test') ? '../../' : '') + `screenshot-${process.platform}.png`);
-          console.log('Saving the screenshot buffer', screenshotPath);
-          await fs.writeFile(screenshotPath, buffer);
-
-          console.log('Deleting the temporary demo file');
-          await fs.remove(directoryPath);
-          break;
-        }
-        case undefined: {
-          // Ignore events
-          break;
-        }
-        default: {
-          throw new Error(`Unexpected ID.`);
-        }
+      const { id, result, error, ...rest } = JSON.parse(data.toString());
+      if (id !== 1 || !result || !result.result || result.result.type !== 'string' || !result.result.value || error) {
+        reject({ id, result, error, rest });
       }
+
+      resolve(result.result.value);
     });
 
-    console.log('Enabling the runtime agent');
-    socket.send(JSON.stringify({ id: 1, method: 'Runtime.enable' }));
-  });
+    // Evaluate the expression which logs the screenshot data URL to the console
+    console.log('Evaluating the expression which captures the screenshot');
+    const expression = [
+      `const electron = process.mainModule.require('electron');`,
+      `const webContents = electron.webContents.getAllWebContents()[0] // [1] is the shared process`,
+
+      // Note that we are sending a data URI of the image as we cannot send the `NativeImage` instance itself
+      'webContents.capturePage().then(nativeImage => nativeImage.toDataURL())'
+    ].join('\n');
+    socket.send(JSON.stringify({ id: 1, method: 'Runtime.evaluate', params: { expression, awaitPromise: true, replMode: true } }));
+
+    // Await the evaluation completion with the screenshot data URL
+    console.log('Awaiting the evaluation completion with the data URL');
+    const dataUrl = await promise;
+
+    // Bufferize the data URL
+    console.log('Bufferizing the screenshot Base64');
+    const buffer = Buffer.from(dataUrl.substring('data:image/png;base64,'.length), 'base64');
+
+    // Save the screenshot to a file
+    console.log('Saving the screenshot buffer');
+    // Note that in local, `process.cwd()` is in `.vscode-test/vscode-version`
+    const screenshotPath = path.resolve((process.cwd().includes('.vscode-test') ? '../../' : '') + `screenshot-${process.platform}.png`);
+    await fs.writeFile(screenshotPath, buffer);
+    console.log('Screenshot saved:', screenshotPath);
+
+    // Delete the temporary demo file
+    console.log('Deleting the temporary demo file');
+    await fs.remove(directoryPath);
+  }).timeout(60 * 1000);
 });
