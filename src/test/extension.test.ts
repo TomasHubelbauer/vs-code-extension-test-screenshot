@@ -115,7 +115,7 @@ suite("Extension Tests", function () {
     console.log('Evaluating the expression which captures the screenshot');
     const expression = [
       `const electron = process.mainModule.require('electron');`,
-      `const webContents = electron.webContents.getAllWebContents()[1] // [1] is the shared process`,
+      `const webContents = electron.webContents.getAllWebContents().find(wc => wc.browserWindowOptions.show !== false);`,
 
       // Note that we are sending a data URI of the image as we cannot send the `NativeImage` instance itself
       'webContents.capturePage().then(nativeImage => nativeImage.toDataURL())'
