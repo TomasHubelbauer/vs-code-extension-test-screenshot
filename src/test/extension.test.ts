@@ -93,6 +93,7 @@ suite("Extension Tests", function () {
     await new Promise(resolve => socket.once('open', resolve));
 
     let done = false;
+    let progress = 0;
     new Promise(async () => {
       const editor = vscode.window.activeTextEditor!;
       const content = [
@@ -128,6 +129,8 @@ suite("Extension Tests", function () {
 
         // Slow down the pace of the typing
         await new Promise(resolve => setTimeout(resolve, 20));
+
+        progress = index / content.length;
       }
 
       // Make for a dramatic closing
@@ -153,7 +156,7 @@ suite("Extension Tests", function () {
     const fps = 10;
     do {
       // Evaluate the expression which logs the screenshot data URL to the console
-      console.log('Evaluating the expression which captures the screenshot');
+      console.log('Evaluating the expression which captures the screenshot', ~~progress, '%');
       const expression = [
         // TODO: Find a way to make `replMode` work and then use `const`
         `var electron = process.mainModule.require('electron');`,
@@ -165,7 +168,7 @@ suite("Extension Tests", function () {
       socket.send(JSON.stringify({ id: index, method: 'Runtime.evaluate', params: { expression, awaitPromise: true, replMode: true } }));
 
       // Await the evaluation completion with the screenshot data URL
-      console.log('Awaiting the evaluation completion with the data URL');
+      console.log('Awaiting the evaluation completion with the data URL', ~~progress, '%');
       const dataUrl = await deferred.promise;
 
       // Bufferize the data URL

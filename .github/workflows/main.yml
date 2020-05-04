@@ -23,7 +23,10 @@ jobs:
         # Run the test which generates the screenshot
         xvfb-run --auto-servernum npm test
         # Crush all PNGs for smaller file sizes
-        for file in *.apng; do pngcrush -ow "$file"
+        for file in *.apng
+        do
+          pngcrush -ow "$file"
+        done
         # Stage the captured screenshot
         git add screencast-*.apng
         # Reset unstaged changes so that Git commit won't fail (e.g.: package-lock.json, temporary files, …)
@@ -35,7 +38,7 @@ jobs:
         # Commit the staged changes to the workflow repository
         git commit -m "Commit the recorded screencast"
         # Authenticate with GitHub using the out of the box workflow integration PAT
-        git remote set-url origin https://tomashubelbauer:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+        git remote set-url origin https://tomashubelbauer:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}
         # Pull before pushing to integrate fast forward changes if any
         git pull
         # Push the generated data to GitHub
