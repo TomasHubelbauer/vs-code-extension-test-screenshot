@@ -1,5 +1,17 @@
 # VS Code `npm test` Screenshot
 
+Windows:
+
+<!-- screencast win32 -->
+![](screencast-win32-2020-05-04T18-40-31.431Z.apng)
+<!-- /screencast win32 -->
+
+Linux:
+
+<!-- screencast win32 -->
+todo
+<!-- /screencast win32 -->
+
 This repository contains a VS Code extension which has a faux test which does
 the following:
 
@@ -16,19 +28,6 @@ showcasing the extension functionality for the docs and the readme.
 ## Running
 
 `npm test` generates `screenshot.png`
-
-## Screenshots
-
-These are the latest screenshots coming from the
-[workflow](.github/workflows/main.yml)
-
-### win32
-
-![](screenshot-win32.png)
-
-### linux
-
-![](screenshot-linux.png)
 
 ## Notes
 
@@ -55,50 +54,12 @@ but it is not a concern until Microsoft has enabled that.
 
 ## To-Do
 
-### Fix a black screen coming out of XVFB in GitHub Actions
-
-Afterwards, remove the `rm` commit in the workflow as it won't be needed, since
-the screenshot contain the current date, they will always have a change and thus
-there will be changes to commit.
-
-Standalone Electron doesn't have the same issue:
-https://github.com/TomasHubelbauer/electron-xvfb
-
-I am trying to reproduce it with VS Code here:
-https://github.com/TomasHubelbauer/vs-code-xvfb
-
 ### Matrix the GitHub Actions workflow and collect screenshots for all platforms
 
 ### Package this as a library
 
 ### Look into `Page.captureScreenshot` and `Page.startScreencast`
 
-`captureScreenshot` example
-```javascript
-console.log('Subscribing to callbacks…');
-socket.on('message', async data => {
-  console.log(data); // 'Page.captureScreenshot' wasn't found
-  assert.ok(data);
-  const buffer = Buffer.from(String(data), 'base64');
-  console.log('Saving the screenshot buffer…');
-  // Note that `process.cwd()` is in `.vscode-test/vscode-version`
-  await fs.writeFile('../../screenshot.png', buffer);
-});
+https://vanilla.aslushnikov.com/?Page.captureScreenshot
 
-console.log('Capturing the screenshot');
-socket.send(JSON.stringify({ id: 1, method: 'Page.captureScreenshot' }));
-```
-
-`startScreencast` example
-```javascript
-console.log('Subscribing to callbacks…');
-socket.on('message', async data => {
-  console.log(data);
-});
-
-console.log('Starting the screencast');
-socket.send(JSON.stringify({ id: 1, method: 'Page.startScreencast' }));
-```
-
-See if `Page.startScreencast` might work for animated APNGs for the README.
-Use my `node-apng` for that.
+https://vanilla.aslushnikov.com/?Page.startScreencast

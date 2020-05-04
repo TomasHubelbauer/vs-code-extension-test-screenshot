@@ -4,6 +4,7 @@ import fetch from 'node-fetch';
 import * as ws from 'ws';
 import * as fs from 'fs-extra';
 import * as vscode from 'vscode';
+const apng = require('node-apng');
 
 function defer<T>() {
   let resolve: (value: T) => void = undefined!;
@@ -38,20 +39,12 @@ suite("Extension Tests", function () {
   test("Screenshot", async function () {
     // Generate the demo file
     console.log('Generating the demo file');
-    const content = [
-      '# VS Code Extension `npm test` Screenshot',
-      '',
-      'This screenshot was captured completely automatically for the purpose of',
-      'VS Code extension documentation generation.',
-      '',
-      `It was captured on *${new Date().toLocaleString()}*.`,
-    ].join('\n');
 
     // Go up and out of the directory with the test version of VS Code in it
     const directoryPath = '../../demo';
     await fs.emptyDir(directoryPath);
     const filePath = path.resolve(path.join(directoryPath, 'readme.md'));
-    await fs.writeFile(filePath, content);
+    await fs.writeFile(filePath, '');
 
     // Open the demo file in the VS Code instance used for testing
     console.log('Opening the demo file');
@@ -99,46 +92,123 @@ suite("Extension Tests", function () {
     const socket = new ws(url, { perMessageDeflate: false });
     await new Promise(resolve => socket.once('open', resolve));
 
-    // Defer anticipated messages to promises based on callbacks
-    console.log('Deferring anticipated messages to promises based on callbacks');
-    const { promise, resolve, reject } = defer<string>();
-    socket.on('message', async data => {
-      const { id, result, error, ...rest } = JSON.parse(data.toString());
-      if (id !== 1 || !result || !result.result || result.result.type !== 'string' || !result.result.value || error) {
-        reject({ id, result, error, rest });
+    let done = false;
+    new Promise(async () => {
+      const editor = vscode.window.activeTextEditor!;
+      const content = [
+        '# VS Code Extension `npm test` Screenshot',
+        '',
+        'This screenshot was captured completely automatically for the purpose of',
+        'VS Code extension documentation generation.',
+        '',
+        `It was captured on *${new Date().toLocaleString()}*.`,
+        '',
+        '## How does it work?',
+        '',
+        '1. Find VS Code process IDs',
+        '2. Find main VS Code process ID (is its own PPID)',
+        '3. Attach debugger to the main VS Code process ID',
+        '4. Download debugger connection information',
+        '5. Connect to the web socket and use CDP',
+        '6. Issue CDP command Runtime.evaluate running webContents.capturePage repeatedly',
+        '7. Use the VS Code API from the test runner to manipulate VS Code and your extension',
+        '8. Stich the individual screenshots into an APNG and embed in in the readme',
+        '10. Profit? Hah! This is open source you fool',
+        '',
+        '## Who made this?',
+        '',
+        '[Tomas Hubelbauer](https://hubelbauer.net)',
+      ].join('\n') + '\n';
+
+      // Make for a dramatic opening
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      for (let index = 0; index < content.length; index++) {
+        await editor.edit(editBuilder => editBuilder.insert(editor.selection.end, content[index]));
+
+        // Slow down the pace of the typing
+        await new Promise(resolve => setTimeout(resolve, 50));
       }
 
-      resolve(result.result.value);
+      // Make for a dramatic closing
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      done = true;
     });
 
-    // Evaluate the expression which logs the screenshot data URL to the console
-    console.log('Evaluating the expression which captures the screenshot');
-    const expression = [
-      `const electron = process.mainModule.require('electron');`,
-      `const webContents = electron.webContents.getAllWebContents().find(wc => wc.browserWindowOptions.show !== false);`,
+    // Defer anticipated messages to promises based on callbacks
+    console.log('Deferring anticipated messages to promises based on callbacks');
+    let index = 0;
+    let deferred = defer<string>();
+    socket.on('message', async data => {
+      const { id, result, error, ...rest } = JSON.parse(data.toString());
+      if (id !== index || !result || !result.result || result.result.type !== 'string' || !result.result.value || error) {
+        deferred.reject({ id, result, error, rest });
+      }
 
-      // Note that we are sending a data URI of the image as we cannot send the `NativeImage` instance itself
-      'webContents.capturePage().then(nativeImage => nativeImage.toDataURL())'
-    ].join('\n');
-    socket.send(JSON.stringify({ id: 1, method: 'Runtime.evaluate', params: { expression, awaitPromise: true, replMode: true } }));
+      deferred.resolve(result.result.value);
+      deferred = defer<string>();
+    });
 
-    // Await the evaluation completion with the screenshot data URL
-    console.log('Awaiting the evaluation completion with the data URL');
-    const dataUrl = await promise;
+    const buffers: Buffer[] = [];
+    const fps = 20;
+    do {
+      // Evaluate the expression which logs the screenshot data URL to the console
+      console.log('Evaluating the expression which captures the screenshot');
+      const expression = [
+        // TODO: Find a way to make `replMode` work and then use `const`
+        `var electron = process.mainModule.require('electron');`,
+        `var webContents = electron.webContents.getAllWebContents().find(wc => wc.browserWindowOptions.show !== false);`,
 
-    // Bufferize the data URL
-    console.log('Bufferizing the screenshot Base64');
-    const buffer = Buffer.from(dataUrl.substring('data:image/png;base64,'.length), 'base64');
+        // Note that we are sending a data URI of the image as we cannot send the `NativeImage` instance itself
+        'webContents.capturePage().then(nativeImage => nativeImage.toDataURL())'
+      ].join('\n');
+      socket.send(JSON.stringify({ id: index, method: 'Runtime.evaluate', params: { expression, awaitPromise: true, replMode: true } }));
+
+      // Await the evaluation completion with the screenshot data URL
+      console.log('Awaiting the evaluation completion with the data URL');
+      const dataUrl = await deferred.promise;
+
+      // Bufferize the data URL
+      console.log('Bufferizing the screenshot Base64');
+      const buffer = Buffer.from(dataUrl.substring('data:image/png;base64,'.length), 'base64');
+      buffers.push(buffer);
+
+      await new Promise(resolve => setTimeout(resolve, 100 / fps));
+
+      index++;
+    } while (!done);
 
     // Save the screenshot to a file
-    console.log('Saving the screenshot buffer');
+    console.log('Saving the screencast buffer');
     // Note that in local, `process.cwd()` is in `.vscode-test/vscode-version`
-    const screenshotPath = path.resolve((process.cwd().includes('.vscode-test') ? '../../' : '') + `screenshot-${process.platform}.png`);
-    await fs.writeFile(screenshotPath, buffer);
-    console.log('Screenshot saved:', screenshotPath);
+    const stamp = new Date().toISOString().replace(/:/g, '-');
+    const screencastPath = path.resolve((process.cwd().includes('.vscode-test') ? '../../' : '') + `screencast-${process.platform}-${stamp}.apng`);
+    const buffer = apng(buffers, () => ({ numerator: 1, denominator: fps }));
+    await fs.writeFile(screencastPath, buffer);
+    console.log('Screencast saved:', screencastPath);
+
+    // Embed the screencast in the readme
+    const readmePath = path.resolve((process.cwd().includes('.vscode-test') ? '../../' : '') + 'README.md');
+    let readme = await fs.readFile(readmePath, { encoding: 'utf-8' });
+    const markdown = `<!-- screencast ${process.platform} -->\n![](screencast-${process.platform}-${stamp}.apng)\n<!-- /screencast ${process.platform} -->`;
+    switch (process.platform) {
+      case 'linux': {
+        readme = readme.replace(/<!-- screencast linux -->[\s\S]*<!-- \/screencast linux -->/, markdown);
+        break;
+      }
+      case 'win32': {
+        readme = readme.replace(/<!-- screencast win32 -->[\s\S]*<!-- \/screencast win32 -->/, markdown);
+        break;
+      }
+      default: {
+        throw new Error(`Unknown platform ${process.platform}`);
+      }
+    }
+
+    await fs.writeFile(readmePath, readme);
 
     // Delete the temporary demo file
     console.log('Deleting the temporary demo file');
     await fs.remove(directoryPath);
-  }).timeout(10 * 1000);
+  }).timeout(Number.MAX_SAFE_INTEGER);
 });
