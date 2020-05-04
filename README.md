@@ -27,7 +27,7 @@ showcasing the extension functionality for the docs and the readme.
 
 ## Running
 
-`npm test` generates `screenshot.png`
+`npm test` generates `screencast-*.apng` and embeds it in the readme.
 
 ## Notes
 
@@ -54,12 +54,25 @@ but it is not a concern until Microsoft has enabled that.
 
 ## To-Do
 
-### Matrix the GitHub Actions workflow and collect screenshots for all platforms
+### Package this as a library for use in VS Code extension building
 
-### Package this as a library
+Or perhaps more general - split into logic for finding the VS Code main window
+PID and to logic for capturing screencasts of any Electron applications:
 
-### Look into `Page.captureScreenshot` and `Page.startScreencast`
+```js
+await startScreencast();
+/* Use the VS Code API / Electron and CDP to manipulate the window's contents */
+const buffer = await stopScreencast();
+```
+
+### Use this in my MarkDown To-Do and MarkDown Link Suggestions extensions
+
+### Troubleshoot `Page.captureScreenshot` and `Page.startScreencast` not working
 
 https://vanilla.aslushnikov.com/?Page.captureScreenshot
 
 https://vanilla.aslushnikov.com/?Page.startScreencast
+
+### See if it is possible to pass `--inspect` to the current VS Code version
+
+https://github.com/microsoft/vscode-docs/blob/vnext/api/working-with-extensions/testing-extension.md#debugging-the-tests

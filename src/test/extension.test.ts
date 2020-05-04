@@ -134,7 +134,7 @@ suite("Extension Tests", function () {
       }
 
       // Make for a dramatic closing
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
       done = true;
     });
 
