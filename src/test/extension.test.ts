@@ -185,7 +185,7 @@ suite("Extension Tests", function () {
     console.log('Saving the screencast buffer');
     // Note that in local, `process.cwd()` is in `.vscode-test/vscode-version`
     const stamp = new Date().toISOString().replace(/:/g, '-');
-    const screencastPath = path.resolve((process.cwd().includes('.vscode-test') ? '../../' : '') + `screencast-${process.platform}-${stamp}.apng`);
+    const screencastPath = path.resolve((process.cwd().includes('.vscode-test') ? '../../' : '') + `screencast-${stamp}-${process.platform}.apng`);
     const buffer = apng(buffers, () => ({ numerator: 1, denominator: fps }));
     await fs.writeFile(screencastPath, buffer);
     console.log('Screencast saved:', screencastPath);
@@ -193,7 +193,7 @@ suite("Extension Tests", function () {
     // Embed the screencast in the readme
     const readmePath = path.resolve((process.cwd().includes('.vscode-test') ? '../../' : '') + 'README.md');
     let readme = await fs.readFile(readmePath, { encoding: 'utf-8' });
-    const markdown = `<!-- screencast ${process.platform} -->\n![](screencast-${process.platform}-${stamp}.apng)\n<!-- /screencast ${process.platform} -->`;
+    const markdown = `<!-- screencast ${process.platform} -->\n![](screencast-${stamp}-${process.platform}.apng)\n<!-- /screencast ${process.platform} -->`;
     console.log('Embedding', markdown, 'into the readme')
     switch (process.platform) {
       case 'linux': {
