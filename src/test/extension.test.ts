@@ -20,6 +20,20 @@ function defer<T>() {
   return { promise, resolve, reject };
 }
 
+async function retry<T>(action: () => Promise<T>) {
+  let attempt = 1;
+  do {
+    try {
+      return await action();
+    }
+    catch (error) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  } while (attempt < 5);
+
+  throw new Error(`Failed to invoke action successfuly in ${attempt} attempts.`);
+}
+
 suite("Extension Tests", function () {
   test("Screenshot", async function () {
     // Generate the demo file
@@ -71,7 +85,7 @@ suite("Extension Tests", function () {
     // https://chromedevtools.github.io/devtools-protocol/#endpoints
     // chrome://inspect
     console.log('Downloading the debugger connection information');
-    const response = await fetch('http://localhost:9229/json');
+    const response = await retry(() => fetch('http://localhost:9229/json'));
     const data = await response.json();
     const url = data[0].webSocketDebuggerUrl as string;
 
@@ -126,5 +140,5 @@ suite("Extension Tests", function () {
     // Delete the temporary demo file
     console.log('Deleting the temporary demo file');
     await fs.remove(directoryPath);
-  }).timeout(60 * 1000);
+  }).timeout(10 * 1000);
 });
