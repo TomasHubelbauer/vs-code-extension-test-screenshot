@@ -20,15 +20,20 @@ jobs:
         git checkout master
         # Install Node dependencies
         npm install
-        # Delete the screenshot files so that if they don't change there's still stuff to commit
-        rm screenshot-*.png
-        git add screenshot-*.png
-        git commit -m "Delete outdated screenshots"
         # Run the test which generates the screenshot
         xvfb-run --auto-servernum npm test
         # Stage the captured screenshot
-        git add screenshot-*.png
-        git commit -m "Commit the captured screenshots"
+        git add screencast-*.apng
+        # Reset unstaged changes so that Git commit won't fail (e.g.: package-lock.json, temporary files, …)
+        git checkout -- .
+        
+        # Bail if there are no changes to commit and hence no GitHub Pages to build
+        if git diff-index --quiet HEAD --; then
+          exit
+        fi
+
+        # Commit the staged changes to the workflow repository
+        git commit -m "Commit the recorded screencast"
         # Authenticate with GitHub using the out of the box workflow integration PAT
         git remote set-url origin https://tomashubelbauer:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         # Pull before pushing to integrate fast forward changes if any
