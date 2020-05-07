@@ -76,3 +76,5 @@ https://vanilla.aslushnikov.com/?Page.startScreencast
 ### See if it is possible to pass `--inspect` to the current VS Code version
 
 https://github.com/microsoft/vscode-docs/blob/vnext/api/working-with-extensions/testing-extension.md#debugging-the-tests
+
+https://github.com/microsoft/vscode/issues/97182
