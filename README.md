@@ -78,3 +78,5 @@ https://vanilla.aslushnikov.com/?Page.startScreencast
 https://github.com/microsoft/vscode-docs/blob/vnext/api/working-with-extensions/testing-extension.md#debugging-the-tests
 
 https://github.com/microsoft/vscode/issues/97182
+
+### Integrate https://github.com/TomasHubelbauer/node-cdp-ws into this
