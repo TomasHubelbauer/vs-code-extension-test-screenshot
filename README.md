@@ -3,7 +3,7 @@
 Windows:
 
 <!-- screencast win32 -->
-![](screencast-2020-05-04T19-28-28.896Z-win32.apng)
+![](screencast-2020-11-22T20-15-03.750Z-win32.apng)
 <!-- /screencast win32 -->
 
 Linux:
@@ -66,12 +66,6 @@ const buffer = await stopScreencast();
 ```
 
 ### Use this in my MarkDown To-Do and MarkDown Link Suggestions extensions
-
-### Troubleshoot `Page.captureScreenshot` and `Page.startScreencast` not working
-
-https://vanilla.aslushnikov.com/?Page.captureScreenshot
-
-https://vanilla.aslushnikov.com/?Page.startScreencast
 
 ### See if it is possible to pass `--inspect` to the current VS Code version
 

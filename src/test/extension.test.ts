@@ -156,16 +156,12 @@ suite("Extension Tests", function () {
     const fps = 10;
     do {
       // Evaluate the expression which logs the screenshot data URL to the console
+      // Note that `Page.captureScreenshot` cannot be used probably due to this being Node not Electron
       console.log('Evaluating the expression which captures the screenshot', ~~(progress * 100), '%');
-      const expression = [
-        // TODO: Find a way to make `replMode` work and then use `const`
-        `var electron = process.mainModule.require('electron');`,
-        `var webContents = electron.webContents.getAllWebContents().find(wc => wc.browserWindowOptions.show !== false);`,
 
-        // Note that we are sending a data URI of the image as we cannot send the `NativeImage` instance itself
-        'webContents.capturePage().then(nativeImage => nativeImage.toDataURL())'
-      ].join('\n');
-      socket.send(JSON.stringify({ id: index, method: 'Runtime.evaluate', params: { expression, awaitPromise: true, replMode: true } }));
+      // Note that we are sending a data URI of the image as we cannot send the `NativeImage` instance itself
+      const expression = `process.mainModule.require('electron').webContents.getAllWebContents().find(wc => wc.browserWindowOptions.show !== false).webContents.capturePage().then(nativeImage => nativeImage.toDataURL())`;
+      socket.send(JSON.stringify({ id: index, method: 'Runtime.evaluate', params: { expression, awaitPromise: true } }));
 
       // Await the evaluation completion with the screenshot data URL
       console.log('Awaiting the evaluation completion with the data URL', ~~(progress * 100), '%');
