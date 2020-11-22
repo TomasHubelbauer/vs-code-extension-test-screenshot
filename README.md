@@ -9,7 +9,7 @@ Windows:
 Linux:
 
 <!-- screencast linux -->
-![](screencast-2020-11-22T20-19-48.947Z-linux.apng)
+![](screencast-2020-11-22T20-31-31.279Z-linux.apng)
 <!-- /screencast linux -->
 
 This repository contains a VS Code extension which has a faux test which does
