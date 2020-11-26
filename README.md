@@ -74,3 +74,7 @@ https://github.com/microsoft/vscode-docs/blob/vnext/api/working-with-extensions/
 https://github.com/microsoft/vscode/issues/97182
 
 ### Integrate https://github.com/TomasHubelbauer/node-cdp-ws into this
+
+### Use https://github.com/TomasHubelbauer/svg-screencast instead of APNG for smaller size
+
+Purge the APNGs from repo history to make the repo overall smaller.
