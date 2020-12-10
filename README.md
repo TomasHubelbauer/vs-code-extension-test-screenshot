@@ -73,7 +73,9 @@ https://github.com/microsoft/vscode-docs/blob/vnext/api/working-with-extensions/
 
 https://github.com/microsoft/vscode/issues/97182
 
-### Integrate https://github.com/TomasHubelbauer/node-cdp-ws into this
+### Align with https://github.com/TomasHubelbauer/vscode-bare-extension
+
+Uses https://github.com/TomasHubelbauer/node-cdp-ws and this should too.
 
 ### Use https://github.com/TomasHubelbauer/svg-screencast instead of APNG for smaller size
 
