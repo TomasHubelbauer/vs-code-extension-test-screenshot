@@ -2,15 +2,11 @@
 
 Windows:
 
-<!-- screencast win32 -->
-![](screencast-2020-11-22T20-15-03.750Z-win32.apng)
-<!-- /screencast win32 -->
+![](screencast-win32.apng)
 
 Linux:
 
-<!-- screencast linux -->
-![](screencast-2020-12-10T18-14-16.390Z-linux.apng)
-<!-- /screencast linux -->
+![](screencast-linux.apng)
 
 This repository contains a VS Code extension which has a faux test which does
 the following:
