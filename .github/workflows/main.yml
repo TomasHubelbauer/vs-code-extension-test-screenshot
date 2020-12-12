@@ -16,12 +16,10 @@ jobs:
         # Configure Git for the push from the workflow to the repository
         git config --global user.email "tomas@hubelbauer.net"
         git config --global user.name "Tomas Hubelbauer"
-        # Check out the `master` branch because by default GitHub Actions checks out detached HEAD
-        git checkout master
+        # Wipe existing screenshot from the history
+        git filter-branch --index-filter "git rm --cached --ignore-unmatch screencast-linux.apng" --prune-empty HEAD
         # Install Node dependencies
         npm install
-        # Delete the current screencast if any
-        rm -f screencast-*-linux.apng
         # Run the test which generates the screenshot
         xvfb-run --auto-servernum npm test
         # Stage the captured screenshot
